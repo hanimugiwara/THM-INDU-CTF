@@ -1,0 +1,11 @@
+# Requirements for THM-INDU-CTF Python Scripts
+# Install with: pip install -r requirements.txt
+
+# Modbus protocol support for industrial device scanning
+pymodbus>=3.0.0,<4.0.0
+
+# HTTP library for web requests and API interactions
+requests>=2.25.0
+
+# URL handling and SSL configuration
+urllib3>=1.26.0

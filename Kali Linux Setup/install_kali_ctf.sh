@@ -12,6 +12,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="$SCRIPT_DIR/ctf_setup.log"
 CONFIG_FILE="$SCRIPT_DIR/ctf_config.conf"
 BACKUP_DIR="$SCRIPT_DIR/backups"
+SKIP_DISK_CHECK=false
 
 # Colors for output
 RED='\033[0;31m'
@@ -68,10 +69,14 @@ preflight_checks() {
     fi
     
     # Check available disk space (minimum 5GB)
-    local available_space=$(df / | awk 'NR==2 {print $4}')
-    if [[ $available_space -lt 5242880 ]]; then  # 5GB in KB
-        log "ERROR" "Insufficient disk space. At least 5GB required."
-        exit 1
+    if [[ "$SKIP_DISK_CHECK" == "false" ]]; then
+        local available_space=$(df / | awk 'NR==2 {print $4}')
+        if [[ $available_space -lt 5242880 ]]; then  # 5GB in KB
+            log "ERROR" "Insufficient disk space. At least 5GB required."
+            exit 1
+        fi
+    else
+        log "WARNING" "Disk space check skipped as requested."
     fi
     
     # Check if running on Kali Linux
@@ -275,7 +280,7 @@ main() {
     load_config
     
     # Check for command line arguments
-    if [[ $# -gt 0 ]]; then
+    while [[ $# -gt 0 ]]; do
         case "$1" in
             "--complete"|"-c")
                 install_by_priority "complete"
@@ -290,16 +295,27 @@ main() {
                 verify_installation
                 exit 0
                 ;;
+            "--skip-disk-check")
+                SKIP_DISK_CHECK=true
+                shift
+                ;;
             "--help"|"-h")
-                echo "Usage: $0 [--complete|--critical|--verify|--help]"
-                echo "  --complete, -c : Install all components"
-                echo "  --critical     : Install critical components only"
-                echo "  --verify, -v   : Verify installation"
-                echo "  --help, -h     : Show this help"
+                echo "Usage: $0 [--complete|--critical|--verify|--skip-disk-check|--help]"
+                echo "  --complete, -c     : Install all components"
+                echo "  --critical         : Install critical components only"
+                echo "  --verify, -v       : Verify installation"
+                echo "  --skip-disk-check  : Skip the 5GB disk space check"
+                echo "  --help, -h         : Show this help"
                 exit 0
                 ;;
+            *)
+                if [[ "$1" != "--skip-disk-check" ]]; then
+                    break
+                fi
+                shift
+                ;;
         esac
-    fi
+    done
     
     # Interactive menu
     while true; do

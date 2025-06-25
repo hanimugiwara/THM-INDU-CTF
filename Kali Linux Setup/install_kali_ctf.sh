@@ -276,22 +276,26 @@ trap cleanup SIGINT SIGTERM
 main() {
     # Initialize
     log "INFO" "Starting Kali Linux CTF Setup - Version 1.0"
-    preflight_checks
-    load_config
     
-    # Check for command line arguments
+    # Check for command line arguments first (before preflight checks)
     while [[ $# -gt 0 ]]; do
         case "$1" in
             "--complete"|"-c")
+                preflight_checks
+                load_config
                 install_by_priority "complete"
                 verify_installation
                 exit 0
                 ;;
             "--critical")
+                preflight_checks
+                load_config
                 install_by_priority "critical"
                 exit 0
                 ;;
             "--verify"|"-v")
+                preflight_checks
+                load_config
                 verify_installation
                 exit 0
                 ;;
@@ -309,13 +313,14 @@ main() {
                 exit 0
                 ;;
             *)
-                if [[ "$1" != "--skip-disk-check" ]]; then
-                    break
-                fi
                 shift
                 ;;
         esac
     done
+    
+    # Run preflight checks and load config after processing arguments
+    preflight_checks
+    load_config
     
     # Interactive menu
     while true; do

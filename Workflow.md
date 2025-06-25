@@ -25,6 +25,7 @@
 
 ## 📋 Pre-Operation Checklist
 
+
 ### Environment Setup
 ```bash
 # 1. Verify Python environment and dependencies
@@ -59,6 +60,9 @@ ping -c 1 [TARGET_IP_RANGE]
 ### 1.1 Passive Intelligence Gathering
 
 **OSINT Collection**
+![image](https://github.com/user-attachments/assets/0361d6c2-207a-4f11-9412-a9cca7c1a1cb)
+
+
 ```bash
 # Search for Virelia Water information
 # Reference: Recon.md lines 36-72 for complete OSINT techniques
